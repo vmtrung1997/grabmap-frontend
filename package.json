@@ -18,7 +18,8 @@
     "vue-socket.io": "^2.1.1-b",
     "vue-toastr-2": "0.0.10",
     "vue2-leaflet": "^1.2.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "webpack-dev-server": "^2.9.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",

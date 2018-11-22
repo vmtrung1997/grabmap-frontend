@@ -27,7 +27,7 @@
 </template>
 <script>
 export default {
-  name: 'Manager',
+  name: 'Identifier',
   data() {
       return {
           requests: []
@@ -37,7 +37,7 @@ export default {
       getRequest(){
           var self = this;
           this.$store.dispatch('getRequestTable', {state: "not_locate"})
-            .then(data => self.requests = data)
+            .then(data => {self.requests = data; console.log(data)})
             .catch(error => console.log(error));
         //alert('client create request')
       }

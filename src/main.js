@@ -17,6 +17,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
+
 window.toastr = require('toastr')
 
 Vue.use(VueToastr2)
