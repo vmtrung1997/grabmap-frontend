@@ -160,12 +160,9 @@ export default {
       }
       console.log(requestLocated)
       this.$store.dispatch('requestLocated',requestLocated).then(result=>{
-        this.$toastr.success('Request has been submited', 'Success');
         self.$router.push({name: 'home'})
-        
       }).catch(error=>{
         console.log(error);
-        this.$toastr.error('Some error', 'Error');
       });
     },
     setLocation() {
