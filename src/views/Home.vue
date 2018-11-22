@@ -9,6 +9,9 @@
     <div v-else-if="getType == 'manager'">
       <Manager />
     </div>
+    <div v-else-if="getType == 'driver'">
+      <Manager />
+    </div>
     <div v-else>
       <HelloWorld />
     </div>
@@ -21,14 +24,15 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import Client from '@/components/Client.vue'
 import Identifier from '@/components/Identifier.vue'
 import Manager from '@/components/Manager.vue'
-
+import Driver from '@/components/Driver.vue'
 export default {
   name: 'home',
   components: {
     HelloWorld,
     Client,
     Identifier,
-    Manager
+    Manager,
+    Driver
   },
   computed: {
     getType(){

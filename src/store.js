@@ -22,7 +22,7 @@ export default new Vuex.Store({
     userType(state) {
       return state.profile.type;
     },
-    profile(state){
+    profile(state) {
       return state.profile;
     }
   },
@@ -78,7 +78,7 @@ export default new Vuex.Store({
       var refresh_token = localStorage.getItem('refresh_token');
       if (refresh_token) {
         return new Promise((resolve, reject) => {
-          axios.post('/user/getaccess', {refresh_token: refresh_token})
+          axios.post('/user/getaccess', { refresh_token: refresh_token })
             .then(result => {
               var res = result.data;
               context.commit('retrieveAccessToken', res.access_token);
@@ -144,16 +144,16 @@ export default new Vuex.Store({
       })
     },
     register(context, data) {
-        return new Promise((resolve, reject) => {
-          axios.post('/user/register', data)
-            .then(result => {
-              resolve(result);
-            })
-            .catch(error => {
-              console.log(error)
-              reject(error)
-            })
-        })
+      return new Promise((resolve, reject) => {
+        axios.post('/user/register', data)
+          .then(result => {
+            resolve(result);
+          })
+          .catch(error => {
+            console.log(error)
+            reject(error)
+          })
+      })
     },
     submitRequest(context, data) {
       axios.defaults.headers.common['x-access-token'] = context.state.access_token
@@ -180,7 +180,34 @@ export default new Vuex.Store({
             resolve(result.data)
           })
           .catch(error => {
-            console.log(error)
+            console.log(error);
+            reject(error)
+          })
+      });
+    },
+    getRequestLocation(context, data) {
+      axios.defaults.headers.common['x-access-token'] = context.state.access_token
+      console.log(data);
+      return new Promise((resolve, reject) => {
+        axios.post('/request/locate_request', data)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          })
+      });
+    },
+    requestLocated(context, data) {
+      axios.defaults.headers.common['x-access-token'] = context.state.access_token
+      return new Promise((resolve, reject) => {
+        axios.post('/request/located_request', data)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
             reject(error)
           })
       });
