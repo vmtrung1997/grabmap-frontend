@@ -25,9 +25,10 @@ export default {
     profileName(){
       return this.$store.getters.profile.fullname || null;
     },
-    beforeDestroy() {
-      return this.$store.dispatch('destroyToken');
-  }
+    
+  },
+  beforeDestroy() {
+      this.$store.dispatch('destroyToken');
   }
 }
 </script>

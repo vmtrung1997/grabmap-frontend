@@ -10,7 +10,7 @@
       <Manager />
     </div>
     <div v-else-if="getType == 'driver'">
-      <Manager />
+      <Driver />
     </div>
     <div v-else>
       <HelloWorld />

@@ -110,6 +110,7 @@ export default {
     this.$store
       .dispatch("getRequestLocation", { idRequest: this.$route.params.id })
       .then(result => {
+        self.$socket.emit('identifier_locating_request');
         console.log(result);
         self.request = result.request;
         let i = 0;
@@ -160,6 +161,7 @@ export default {
       }
       console.log(requestLocated)
       this.$store.dispatch('requestLocated',requestLocated).then(result=>{
+        this.$socket.emit('identifier_located_request', {position: requestLocated.locationGeoCode});
         this.$toastr.success('Request has been submited', 'Success');
         self.$router.push({name: 'home'})
         

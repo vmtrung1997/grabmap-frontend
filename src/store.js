@@ -211,6 +211,23 @@ export default new Vuex.Store({
             reject(error)
           })
       });
+    },
+    driverLocated(context, data) {
+      axios.defaults.headers.common['x-access-token'] = context.state.access_token
+      var driverInfo = {
+        profile: context.state.profile,
+        position: data
+      }
+      return new Promise((resolve, reject) => {
+        axios.post('/driver/driver_located', driverInfo)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          })
+      });
     }
   }
 })
