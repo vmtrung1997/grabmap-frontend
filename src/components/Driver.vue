@@ -1,12 +1,23 @@
 <template>
   <div>
+    
     <div class="container">
+      <!-- <div class="modal-mask">
+      <md-dialog-confirm style="z-index: 9999 !important;"
+      :md-active.sync="active"
+      md-title="Use Google's location service?"
+      md-content="Let Google help apps determine location. <br> This means sending <strong>anonymous</strong> location data to Google, even when no apps are running."
+      md-confirm-text="Agree"
+      md-cancel-text="Disagree"
+      @md-cancel="onCancel"
+      @md-confirm="onConfirm" />
+      </div> -->
       <div class="col-md-8">
         <l-map
       :zoom="zoom"
       :center="center"
       :options="mapOptions"
-      style="height: 400px;width: 600px"
+      style="height: 400px;width: 600px;z-index: 0 !important;"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate">
       <l-tile-layer
@@ -14,7 +25,19 @@
         :attribution="attribution"/>
       <l-marker :visible="marker.visible"
         :draggable="marker.draggable"
-        :lat-lng.sync="marker.position"/>
+        :lat-lng.sync="marker.position"
+        :icon="marker.icon"/>
+      
+      <l-polyline
+          :lat-lngs="polylineRequest.points"
+          :visible="polylineRequest.visible"
+          :color="polylineRequest.color" />
+
+      <l-marker :visible="markerRq.visible"
+        :draggable="false"
+        :lat-lng="markerRq.position"
+        :icon="markerRq.icon"/>
+      
     </l-map>
       </div>
       <div class="col-md-4">
@@ -43,21 +66,29 @@
       @md-confirm="onConfirm" /> -->
     <div>
     </div>
+    <!-- <confirm-modal
+              btn-text='<i class="fa fa-trash"></i> Delete'
+              btn-class="btn-danger"
+              :post-data="{userId: '123'}"
+              v-on:onConfirm="removeUserFromList(user)"
+              message="Are you sure you want to delete this user?">
+            </confirm-modal> -->
+    
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
-import Vue from 'vue'
+import { LMap, LTileLayer, LMarker, LPolyline } from "vue2-leaflet";
 import { L } from "vue2-leaflet";
-
+// import ConfirmDialog from './ConfirmModal.vue'
 export default {
   name: "identifiermap",
   components: {
     LMap,
     LTileLayer,
-    LMarker
-  },
+    LMarker,
+    LPolyline
+      },
   data() {
     return {
       zoom: 15,
@@ -72,7 +103,7 @@ export default {
         visible: true,
         icon: L.icon.glyph({
           prefix: "",
-          glyph: "A"
+          glyph: "D"
         })
       },
       tempMarkers: [],
@@ -82,11 +113,28 @@ export default {
       mapOptions: {
         zoomSnap: 0.5
       },
-      request: {},
+      request: '',
       isDisable: true,
       isLocated: true,
       isReady: false,
       profile: {},
+      path: {},
+      polylineRequest: {
+        points: [],
+        visible: false,
+        color: 'red'
+      },
+      markerRq: {
+        visible: false,
+        position: {
+          lat: 0,
+          lng: 0
+        },
+        icon: L.icon.glyph({
+          prefix: "",
+          glyph: "R"
+        })
+      },
       value: '',
       active : false,
       data: {}
@@ -111,10 +159,7 @@ export default {
     getLocation() {
       this.marker.draggable = false;
       this.isLocated = true;
-      var position = {
-        lat: this.marker.position.lat,
-        lng: this.marker.position.lng
-      };
+
     },
     changeState() {
       var self = this;
@@ -131,14 +176,23 @@ export default {
           this.$socket.emit('driver_standby', data);
       }
     },
-    onConfirm () {
-        this.value = 'Agreed'
-        this.active = false;
-      },
-      onCancel () {
-        this.value = 'Disagreed'
-        this.active = false;
-      }
+    onAcceptRequest(data) {
+      this.request = data.requestId;
+      this.path = data.path;
+      console.log(data);
+    },
+    getPath(data){
+      
+    }
+    // onConfirm(){
+    //   this.$socket.emit('driver_accept_request', this.data);
+    // },
+    // onCancel(){
+    //   this.$socket.emit('driver_discard_request', this.data);
+    // }
+    // removeUserFromList (userToRemove) {
+    //     console.log('confirm');
+    //   }
   },
   created() {},
   beforeMount() {
@@ -151,25 +205,26 @@ export default {
       window.dispatchEvent(new Event("resize"));
     }, 250);
     self.$socket.on('driver_confirm_request', function(data){
-      // self.$dialog.confirm('Request from ' + data.path)
-      //   .then(function (dialog) {
+      self.$dialog.confirm('Request from ' + data.path)
+        .then(function (dialog) {
             
-      //       console.log('Clicked on proceed')
-      //       dialog.close && dialog.close();
-      //       console.log(data);
-      //       self.$socket.emit('driver_accept_request', data);
-      //   })
-      //   .catch(function () {
-      //       console.log('Clicked on cancel')
-      //   });
+            console.log('Clicked on proceed')
+            dialog.close && dialog.close();
+            console.log(data);
+            self.$socket.emit('driver_accept_request', data);
+            self.getPath(data);
+        })
+        .catch(function () {
+            console.log('Clicked on cancel')
+        });
       // self.data = data;
       // self.active = true;
-      var r = confirm('Request from ' + data.path.distance);
-      if (r){
-        self.$socket.emit('driver_accept_request', data);
-      } else {
-        self.$socket.emit('driver_discard_request', data);
-      }
+      // if (confirm('Request from ' + data.path.distance)){
+      //   self.$socket.emit('driver_accept_request', data);
+      //   self.onAcceptRequest(data);
+      // } else {
+      //   self.$socket.emit('driver_discard_request', data);
+      // }
     })
   },
   beforeDestroy(){

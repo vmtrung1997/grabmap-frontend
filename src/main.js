@@ -9,7 +9,7 @@ import 'vue-toastr-2/dist/vue-toastr-2.min.css'
 import { L } from 'vue2-leaflet';
 import 'leaflet.icon.glyph';
 import 'leaflet/dist/leaflet.css';
-//import VuejsDialog from "vuejs-dialog"
+import VuejsDialog from "vuejs-dialog"
  
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -21,16 +21,16 @@ L.Icon.Default.mergeOptions({
 
 
 // include the default style
-//import 'vuejs-dialog/dist/vuejs-dialog.min.css'
+import 'vuejs-dialog/dist/vuejs-dialog.min.css'
  
 // Tell Vue to install the plugin.
-// Vue.use(VuejsDialog,{
-//     html: true, 
-//     loader: true,
-//     okText: 'Accept',
-//     cancelText: 'Decline',
-//     animation: 'bounce', 
-// })
+Vue.use(VuejsDialog,{
+    html: true, 
+    loader: true,
+    okText: 'Accept',
+    cancelText: 'Decline',
+    animation: 'bounce', 
+})
 // import VueMaterial from 'vue-material'
 // import 'vue-material/dist/vue-material.min.css'
  
