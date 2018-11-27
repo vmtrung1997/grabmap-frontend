@@ -19,7 +19,7 @@
                 <td class="text-left">{{request.address}}</td>
                 <td class="text-left">{{request.note}}</td>
                 <td class="text-left">{{request.state}}</td>
-                <td class="text-left"><input type="button" class="btn btn-success" value="view status"/></td>
+                <td class="text-left"><router-link :to="{name: 'viewPath', params:{id: request._id}}">view status</router-link></td>
             </tr>
         </tbody>
     </table>
@@ -40,7 +40,7 @@ export default {
             .then(data => self.requests = data)
             .catch(error => console.log(error));
         //alert('client create request')
-      }
+      },
   },
   beforeMount() {
       this.getRequest();

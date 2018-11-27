@@ -6,6 +6,7 @@ import Logout from './views/Logout.vue'
 import Register from './views/Register.vue'
 import RequestSubmited from './views/RequestSubmited.vue'
 import IdentifierMap from './views/IdentifierMap.vue'
+import MapPath from './views/MapPath.vue'
 import store from './store'
 Vue.use(Router)
 export const router = new Router({
@@ -24,6 +25,7 @@ export const router = new Router({
     { path: '/request_submit', name: 'requestSubmit',component:RequestSubmited},
     { path: '/logout', name: 'logout',component:Logout},
     { path: '/locate/:id', name: 'locate', component:IdentifierMap},
+    { path: '/view_path/:id', name: 'viewPath', component:MapPath}
   ], 
   mode: 'history'
 })
