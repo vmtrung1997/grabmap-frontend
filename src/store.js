@@ -212,6 +212,32 @@ export default new Vuex.Store({
           })
       });
     },
+    getDriverDetail(context, data){
+      axios.defaults.headers.common['x-access-token'] = context.state.access_token
+      return new Promise((resolve, reject) => {
+        axios.post('/manager/get_detail', data)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          })
+      });
+    },
+    getRouteDriverClient(context, data){
+       axios.defaults.headers.common['x-access-token'] = context.state.access_token
+      return new Promise((resolve, reject) => {
+        axios.post('/manager/get_path', data)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          })
+      });
+    },
     driverLocated(context, data) {
       axios.defaults.headers.common['x-access-token'] = context.state.access_token
       var driverInfo = {
