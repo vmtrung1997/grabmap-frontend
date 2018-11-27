@@ -11,6 +11,11 @@ export default {
       .then(response => {
         this.$router.push({ name: 'home' })
       })
+  },
+  mounted(){
+    if (this.$store.getters.profile.type == 'driver'){
+      this.$socket.emit('driver_logout')
+    }
   }
 }
 </script>

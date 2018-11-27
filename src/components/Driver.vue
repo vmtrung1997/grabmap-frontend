@@ -12,60 +12,43 @@
       <l-tile-layer
         :url="url"
         :attribution="attribution"/>
-      <l-marker v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
-        :draggable="marker.draggable"
-        :lat-lng.sync="marker.position">
-        <l-popup>
-          <div @click="popupClick">
-            I am a tooltip
-            <p v-show="showParagraph">
-              Lorem ipsum dolor sit 
-            </p>
-          </div>
-        </l-popup>
-      </l-marker>
       <l-marker :visible="marker.visible"
         :draggable="marker.draggable"
         :lat-lng.sync="marker.position"/>
     </l-map>
       </div>
       <div class="col-md-4">
-        <div>
-          <form action="">
-            <h2>
-              Request
-            </h2>
-            <div class="form-group">
-              <label for=""> Fullname: </label>{{request.name}}
+        <div class="group-row">
+            <label>Current driver position:</label>&nbsp;{{marker.position}}
+            <div>
+          <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isLocated"/>
+          <input type="button" class="btn btn-default btn-located" @click="getLocation" value="Get locate" :disabled="isLocated"/>
             </div>
-            <div class="form-group">
-              <label for="">Phone: </label>{{request.phone}}
-            </div>
-            <div class="form-group">
-              <label for="">Address: </label>{{request.address}}
-            </div>
-            <div class="form-group">
-              <label for="">Note: </label>{{request.note}}
-            </div>
-          </form>
         </div>
         <div class="group-row">
-          <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isDisable"/>
-        </div>
-        <div class="group-row">
-          <input type="button" class="btn btn-default btn-located" @click="submitRequest" value="Submit" :disabled="isDisable"/>
+          <label>Current state:</label>&nbsp;{{currentState}}
+          <div>
+              <input type="button" class="btn btn-default btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
+          </div>
         </div>
       </div>
     </div>
+    <!-- <md-dialog-confirm
+      :md-active.sync="active"
+      md-title="Use Google's location service?"
+      md-content="Let Google help apps determine location. <br> This means sending <strong>anonymous</strong> location data to Google, even when no apps are running."
+      md-confirm-text="Agree"
+      md-cancel-text="Disagree"
+      @md-cancel="onCancel"
+      @md-confirm="onConfirm" /> -->
     <div>
-     
     </div>
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup, LLayerGroup } from "vue2-leaflet";
-
+import { LMap, LTileLayer, LMarker } from "vue2-leaflet";
+import Vue from 'vue'
 import { L } from "vue2-leaflet";
 
 export default {
@@ -73,8 +56,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LMarker,
-    LPopup
+    LMarker
   },
   data() {
     return {
@@ -85,10 +67,9 @@ export default {
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       markers: [],
       marker: {
-        position: { lat: 1, lng: 1 },
+        position: { lat: 10.7721, lng: 106.65777 },
         draggable: false,
-        visible: false,
-
+        visible: true,
         icon: L.icon.glyph({
           prefix: "",
           glyph: "A"
@@ -102,42 +83,19 @@ export default {
         zoomSnap: 0.5
       },
       request: {},
-      isDisable: true
+      isDisable: true,
+      isLocated: true,
+      isReady: false,
+      profile: {},
+      value: '',
+      active : false,
+      data: {}
     };
   },
-  created() {
-    var self = this;
-    this.$store
-      .dispatch("getRequestLocation", { idRequest: this.$route.params.id })
-      .then(result => {
-        console.log(result);
-        self.request = result.request;
-        let i = 0;
-
-        if (result.location.length > 0) {
-          for (let item of result.location) {
-            let marker = new Object({
-              id: i,
-              position: { lat: item.latitude, lng: item.longitude },
-              tooltip: item.state,
-              draggable: false,
-              visible: true,
-
-              icon: L.icon.glyph({
-                prefix: "",
-                glyph: "A"
-              })
-            });
-            i = i + 1;
-            self.markers.push(marker);
-          }
-          let item = result.location[0];
-          self.center = L.latLng(item.latitude, item.longitude);
-        }
-      });
-  },
-  beforeMount() {
-    console.log(this.$route.params);
+  computed: {
+    currentState() {
+      return this.isReady ? "READY" : "STANDBY";
+    }
   },
   methods: {
     zoomUpdate(zoom) {
@@ -146,39 +104,76 @@ export default {
     centerUpdate(center) {
       this.currentCenter = center;
     },
-    showLongText() {
-      this.showParagraph = !this.showParagraph;
-    },
-    popupClick() {
-      alert("Popup Click!");
-    },
-    submitRequest() {
-      var self = this;
-      var requestLocated = {
-        request: this.request,
-        locationGeoCode: this.marker.position
-      }
-      console.log(requestLocated)
-      this.$store.dispatch('requestLocated',requestLocated).then(result=>{
-        self.$router.push({name: 'home'})
-      }).catch(error=>{
-        console.log(error);
-      });
-    },
     setLocation() {
-      this.tempMarkers = this.markers;
-      this.markers = [];
-      this.marker.visible = true;
-      this.marker.position.lat = this.currentCenter.lat;
-      this.marker.position.lng = this.currentCenter.lng;
       this.marker.draggable = true;
-      this.isDisable = false
-    }
+      this.isLocated = false;
+    },
+    getLocation() {
+      this.marker.draggable = false;
+      this.isLocated = true;
+      var position = {
+        lat: this.marker.position.lat,
+        lng: this.marker.position.lng
+      };
+    },
+    changeState() {
+      var self = this;
+      self.isReady = !self.isReady;
+      var data = {
+            driverId: this.profile._id,
+            position: {lat: this.marker.position.lat,lng: this.marker.position.lng}
+          }
+      if (self.isReady)
+        {
+          this.$socket.emit('driver_ready', data);
+        }
+      else{
+          this.$socket.emit('driver_standby', data);
+      }
+    },
+    onConfirm () {
+        this.value = 'Agreed'
+        this.active = false;
+      },
+      onCancel () {
+        this.value = 'Disagreed'
+        this.active = false;
+      }
+  },
+  created() {},
+  beforeMount() {
+    this.profile = this.$store.state.profile;
+    this.$socket.emit("driver_loged", { id: this.profile._id });
   },
   mounted() {
+    var self=this;
     setTimeout(function() {
       window.dispatchEvent(new Event("resize"));
     }, 250);
+    self.$socket.on('driver_confirm_request', function(data){
+      // self.$dialog.confirm('Request from ' + data.path)
+      //   .then(function (dialog) {
+            
+      //       console.log('Clicked on proceed')
+      //       dialog.close && dialog.close();
+      //       console.log(data);
+      //       self.$socket.emit('driver_accept_request', data);
+      //   })
+      //   .catch(function () {
+      //       console.log('Clicked on cancel')
+      //   });
+      // self.data = data;
+      // self.active = true;
+      var r = confirm('Request from ' + data.path.distance);
+      if (r){
+        self.$socket.emit('driver_accept_request', data);
+      } else {
+        self.$socket.emit('driver_discard_request', data);
+      }
+    })
+  },
+  beforeDestroy(){
+    this.$socket.emit('driver_logout')
   }
 };
 </script>

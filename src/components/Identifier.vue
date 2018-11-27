@@ -47,6 +47,7 @@ export default {
   },
   mounted() {
       this.$socket.on('client_create_request', this.getRequest);
+      this.$socket.on('identifier_locating_request', this.getRequest);
   }
 }
 </script>

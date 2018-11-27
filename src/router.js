@@ -19,7 +19,7 @@ export const router = new Router({
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     },
-    { path: '/', name:'home', component: Home, meta: { requiresAuth: true} },
+    { path: '/', name:'home', component: Home, meta: {requiresAuth: true} },
     { path: '/login', name: 'login', component: Login,meta: {requiresVisitor: true} },
     { path: '/register', name: 'register', component: Register,meta: {requiresVisitor: true} },
     { path: '/request_submit', name: 'requestSubmit',component:RequestSubmited},

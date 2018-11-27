@@ -41,8 +41,9 @@ export default {
               address: this.address,
               note: this.note
           }).then(result => {
-                if (result)
+                if (result.data.success)
                 {
+                    self.$socket.emit('client_create_request')
                     self.name='';
                     self.phone='';
                     self.address='';
