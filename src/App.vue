@@ -35,14 +35,19 @@ export default {
 
 <style>
 @import url("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
-
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  margin-bottom: 0px;
 }
+  .container {
+    height: 555px;
+    width: 100%;
+    background-image: linear-gradient(to left,  #abbaab, #ffffff, #abbaab);
+  }
   .my-form {
     max-width: 500px;
     margin: 0 auto;
@@ -55,7 +60,6 @@ export default {
     justify-content: flex-end;
     background: #F5F8FA;
     border-bottom: 1px solid lightgrey;
-    margin-bottom: 24px;
   }
 
   .nav a {
