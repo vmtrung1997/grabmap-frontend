@@ -19,7 +19,8 @@
       :options="mapOptions"
       style="height: 400px;width: 600px;z-index: 0 !important;"
       @update:center="centerUpdate"
-      @update:zoom="zoomUpdate">
+      @update:zoom="zoomUpdate"
+      @click="onClickMap">
       <l-tile-layer
         :url="url"
         :attribution="attribution"/>
@@ -53,6 +54,11 @@
           <div>
               <input type="button" class="btn btn-default btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
           </div>
+        </div>
+        <div class="group-row" v-show="divStarting">
+          <label>Strarting</label>&nbsp;
+              <input type="button" class="btn btn-default btn-located" @click="onStartingRequest" value="Starting" :disabled="isStarting"/>
+              <input type="button" class="btn btn-default btn-located" @click="onFinishRequest" value="Finished"/>
         </div>
       </div>
     </div>
@@ -113,7 +119,7 @@ export default {
       mapOptions: {
         zoomSnap: 0.5
       },
-      request: '',
+      request: {},
       isDisable: true,
       isLocated: true,
       isReady: false,
@@ -135,6 +141,8 @@ export default {
           glyph: "R"
         })
       },
+      isStarting:false,
+      divStarting: false,
       value: '',
       active : false,
       data: {}
@@ -182,7 +190,51 @@ export default {
       console.log(data);
     },
     getPath(data){
-      
+      var ret = [];
+      var dataArr  = data.path.points.coordinates;
+      for(var i of dataArr) {
+          ret.push(i.reverse());
+      }
+      console.log(this.polylineRequest);
+      this.polylineRequest.points = ret;
+      this.polylineRequest.visible = true;
+
+      this.markerRq.position = data.request.position;
+      this.markerRq.visible = true;
+
+    },
+    onStartingRequest(){
+        this.$socket.emit('driver_starting_request', this.data);
+        this.isStarting = true;
+    },
+
+    onClickMap(event){
+      if (this.isStarting){
+      console.log(event.latlng);
+        var data ={
+          driver: this.data.driver,
+          start: this.marker.position,
+          end: event.latlng
+        }
+        this.$socket.emit('driver_moving', data);
+      }
+    },
+    onFinishRequest(){
+      if (this.isStarting){
+        var data = {
+          driver: this.data.driver,
+          request: this.data.request,
+          point: this.marker.position
+        }
+        this.$socket.emit('driver_finish', data);
+      }
+    },
+    resetRequest(){
+      this.markerRq.visible = false;
+      this.polylineRequest.visible = false;
+      this.request = {};
+      this.data = {};
+      this.divStarting = false;
     }
     // onConfirm(){
     //   this.$socket.emit('driver_accept_request', this.data);
@@ -205,27 +257,60 @@ export default {
       window.dispatchEvent(new Event("resize"));
     }, 250);
     self.$socket.on('driver_confirm_request', function(data){
-      self.$dialog.confirm('Request from ' + data.path)
-        .then(function (dialog) {
+      // self.$dialog.confirm('Request from ' + data.path)
+      //   .then(function (dialog) {
             
-            console.log('Clicked on proceed')
-            dialog.close && dialog.close();
-            console.log(data);
-            self.$socket.emit('driver_accept_request', data);
-            self.getPath(data);
-        })
-        .catch(function () {
-            console.log('Clicked on cancel')
-        });
+      //       console.log('Clicked on proceed')
+      //       dialog.close && dialog.close();
+      //       console.log(data);
+      //       self.$socket.emit('driver_accept_request', data);
+      //       self.getPath(data);
+      //   })
+      //   .catch(function (error) {
+      //       console.log('Clicked on cancel')
+      //   });
       // self.data = data;
       // self.active = true;
-      // if (confirm('Request from ' + data.path.distance)){
-      //   self.$socket.emit('driver_accept_request', data);
-      //   self.onAcceptRequest(data);
-      // } else {
-      //   self.$socket.emit('driver_discard_request', data);
-      // }
-    })
+      if (window.confirm('Request from ' + data.path.distance)){
+        console.log(data);
+
+        self.$socket.emit('driver_accept_request', data);
+        self.data = data;
+        self.divStarting = true;
+        self.getPath(data);
+      } else {
+        self.$socket.emit('driver_discard_request', data);
+      }
+    });
+    self.$socket.on('driver_accept_request', function(data){
+
+    });
+
+    self.$socket.on('drive_moving_response', function(data){
+      if (data.distance > 100){
+        self.$toastr.error('Distance orver 100m', 'Error');
+      }
+      else{
+        self.$toastr.success('Driver position update', 'Success');
+        self.marker.position = data.returnData.end;
+      }
+    });
+
+    self.$socket.on('drive_finished', function(data){
+      if (data.res){
+        self.$toastr.success('Request finish', 'Success');
+        self.resetRequest();
+        var data = {
+            driverId: self.profile._id,
+            position: {lat: self.marker.position.lat,lng: self.marker.position.lng}
+          }
+        self.$socket.emit('driver_ready', data);
+      }
+      else{
+        self.$toastr.error('Driver position update', 'Error');
+      }
+    });
+
   },
   beforeDestroy(){
     this.$socket.emit('driver_logout')

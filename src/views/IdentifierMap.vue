@@ -157,11 +157,11 @@ export default {
       var self = this;
       var requestLocated = {
         request: this.request,
-        locationGeoCode: this.marker.position
+        position: this.marker.position
       }
       console.log(requestLocated)
       this.$store.dispatch('requestLocated',requestLocated).then(result=>{
-        this.$socket.emit('identifier_located_request', {position: requestLocated.locationGeoCode});
+        this.$socket.emit('identifier_located_request', requestLocated);
         this.$toastr.success('Request has been submited', 'Success');
         self.$router.push({name: 'home'})
         

@@ -11,8 +11,13 @@
       </div>
 
       <div class="form-group">
-        <label for="email">Username</label>
-        <input type="text" name="email" id="email" class="form-control" v-model="username" required>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" class="form-control" v-model="username" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="text" name="phone" id="phone" class="form-control" v-model="phone" required>
       </div>
 
       <div class="form-group mb-more">
@@ -43,6 +48,7 @@ export default {
       fullname: '',
       username: '',
       password: '',
+      phone: '',
       type: '',
     }
   },
@@ -53,6 +59,7 @@ export default {
         fullname: this.fullname,
         username: this.username,
         password: this.password,
+        phone: this.phone,
         type: this.type
       }).then(result => {
         if (result.data){
