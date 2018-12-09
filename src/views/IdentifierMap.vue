@@ -7,7 +7,7 @@
           :zoom="zoom"
           :center="center"
           :options="mapOptions"
-          style="height: 500px;width: 900px"
+          style="height: 400px;width: 600px"
           @update:center="centerUpdate"
           @update:zoom="zoomUpdate">
           <l-tile-layer

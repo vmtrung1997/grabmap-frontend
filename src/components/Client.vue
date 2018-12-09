@@ -1,8 +1,8 @@
 <template>
   <div class="my-form">
-    <div class="text-center">
+    <h1>
         App1 Client
-    </div>
+    </h1>
     <form action="#" @submit.prevent="createRequest">
                 <div class="form-group">
                     <label for="name">Full name</label>
