@@ -251,6 +251,20 @@ export default new Vuex.Store({
             reject(error)
           })
       });
+    },
+    driverPosition(context, data) {
+      axios.defaults.headers.common['x-access-token'] = context.state.access_token
+
+      return new Promise((resolve, reject) => {
+        axios.post('/driver/click_position', data)
+          .then(result => {
+            resolve(result.data)
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error)
+          })
+      });
     }
   }
 })

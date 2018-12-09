@@ -2,15 +2,16 @@
   <div>
     <div class="container">
       <div class="content">
-        <div class="col-md-9">
+        <div class="col-md-8">
         <l-map
         :zoom-control="false"
         :zoom="zoom"
-        :center="center"
         :options="mapOptions"
-        style="height: 500px;width: 900px"
+        style="height: 400px;width: 600px"
+        :center="center"
         @update:center="centerUpdate"
-        @update:zoom="zoomUpdate">
+        @update:zoom="zoomUpdate"
+        :bounds="bounds">
         <l-tile-layer
           :url="url"
           :attribution="attribution"/>
@@ -29,11 +30,11 @@
           :color="polyline.color"/>
         </l-map>
         </div>
-        <div class="col-md-3">
-          <div class = "info">
-            <span id="label-driver">
+        <div class="col-md-4">
+          <div class = "">
+            <h3 id="label-driver">
               DRIVER INFORMATION 
-            </span>
+            </h3>
             <table class="table table-bordered table-hover table-info">
               <tbody>
                  <tr>
@@ -83,7 +84,7 @@ export default {
       tempMarkers: [],
       polyline: {
         latlngs: [],
-        color: 'green'
+        color: 'red'
       },
       currentZoom: 11.5,
       currentCenter: L.latLng(10.7721, 106.65777),
@@ -93,7 +94,8 @@ export default {
       },
       request: {},
       driver: {},
-      isDisable: true
+      isDisable: true,
+      bounds: null,
     };
   },
  
@@ -119,7 +121,7 @@ export default {
         .catch(error => reject(error));
       });
       
-    }, 
+    }
   },
   beforeMount(){
       var self = this;
@@ -152,6 +154,11 @@ export default {
             for(var i of dataArr) {
                 ret.push(i.reverse());
             }
+            var corner1 = L.latLng(result.request.position.lat, result.request.position.lng);
+            var corner2 = L.latLng(result.request.driverPosition.lat, result.request.driverPosition.lng);
+
+            self.bounds = L.latLngBounds(corner1, corner2);
+
             self.driver = result.driver;
             self.polyline.latlngs = ret;
           });
@@ -188,7 +195,7 @@ export default {
 }
 
 .table-info {
-  margin-top: 15%;
+  margin-top: 5%;
   width: 100%;
   border-collapse: collapse;
   padding: 10px;

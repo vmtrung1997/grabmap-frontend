@@ -1,16 +1,18 @@
 <template>
   <div>
-    <div class="text-center">App4 Driver</div>
+    <h1>App4 Driver</h1>
     <div class="container">
       <div class="content">
-        <div class="col-md-9">
+        <div class="col-md-8">
           <l-map
         :zoom="zoom"
         :center="center"
         :options="mapOptions"
-        style="height: 500px;width: 900px;z-index: 0 !important;"
+        style="height: 400px;width: 600px;z-index: 0 !important;"
         @update:center="centerUpdate"
-        @update:zoom="zoomUpdate">
+        @update:zoom="zoomUpdate"
+        @click="onClickMap"
+        :bounds="bounds">
         <l-tile-layer
           :url="url"
           :attribution="attribution"/>
@@ -23,29 +25,35 @@
             :lat-lngs="polylineRequest.points"
             :visible="polylineRequest.visible"
             :color="polylineRequest.color" />
-        
+        <l-marker :visible="markerRq.visible"
+        :draggable="markerRq.draggable"
+        :lat-lng.sync="markerRq.position"
+        :icon="markerRq.icon"/>
           </l-map>
         </div>
-        <div class="col-md-3">
-          <div class="group-row">
-              <label>Current driver position:</label>&nbsp;{{marker.position}}
+        <div class="col-md-4">
+          <div style="margin-top: 10%">
+            <div class="group-row">
+              <label>Current driver position:</label>&nbsp;{{address}}
               <div>
-            <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isLocated"/>
-            <input type="button" class="btn btn-default btn-located" @click="getLocation" value="Get locate" :disabled="isLocated"/>
+            <input type="button" class="btn btn-primary btn-located" @click="setLocation" value="Set locate" :disabled="!isLocated"/>
+            <input type="button" class="btn btn-primary btn-located" @click="getLocation" value="Get locate" :disabled="isLocated"/>
               </div>
           </div>
           <div class="group-row">
             <label>Current state:</label>&nbsp;{{currentState}}
             <div>
-                <input type="button" class="btn btn-default btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
+                <input type="button" class="btn btn-primary btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
             </div>
           </div>
+          <div class="group-row" v-show="divStarting">
+          <label>Starting</label>&nbsp;
+              <input type="button" class="btn btn-primary btn-located" @click="onStartingRequest" value="Starting" :disabled="isStarting"/>
+              <input type="button" class="btn btn-primary btn-located" @click="onFinishRequest" value="Finished"/>
         </div>
-        <div class="group-row" v-show="divStarting">
-          <label>Strarting</label>&nbsp;
-              <input type="button" class="btn btn-default btn-located" @click="onStartingRequest" value="Starting" :disabled="isStarting"/>
-              <input type="button" class="btn btn-default btn-located" @click="onFinishRequest" value="Finished"/>
         </div>
+          </div>
+        
       </div>
     </div>
   </div>
@@ -74,7 +82,7 @@ export default {
       marker: {
         position: { lat: 10.7721, lng: 106.65777 },
         draggable: false,
-        visible: true,
+        visible: false,
         icon: L.icon.glyph({
           prefix: "",
           glyph: "D"
@@ -114,7 +122,9 @@ export default {
       value: '',
       active : false,
       data: {},
-      currentState: ''
+      currentState: '',
+      address: '',
+      bounds: null
     };
   },
   methods: {
@@ -129,8 +139,13 @@ export default {
       this.isLocated = false;
     },
     getLocation() {
-      this.marker.draggable = false;
-      this.isLocated = true;
+      var self = this;
+      self.marker.draggable = false;
+      self.isLocated = true;
+      self.$store.dispatch('driverPosition', self.marker).then(result=>{
+        console.log(result);
+        self.address = result.address[0].streetNumber + ', '+ result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
+      })
 
     },
     changeState() {
@@ -162,9 +177,15 @@ export default {
       console.log(this.polylineRequest);
       this.polylineRequest.points = ret;
       this.polylineRequest.visible = true;
+      
 
       this.markerRq.position = data.request.position;
       this.markerRq.visible = true;
+
+      var corner1 = L.latLng(this.marker.position.lat, this.marker.position.lng);
+      var corner2 = L.latLng(this.markerRq.position.lat, this.markerRq.position.lng);
+
+      this.bounds = L.latLngBounds(corner1, corner2);
 
     },
     onStartingRequest(){
@@ -181,6 +202,7 @@ export default {
           end: event.latlng
         }
         this.$socket.emit('driver_moving', data);
+        this.address = '';
       }
     },
     onFinishRequest(){
@@ -195,6 +217,7 @@ export default {
     },
     resetRequest(){
       this.markerRq.visible = false;
+      this.isStarting = false;
       this.polylineRequest.visible = false;
       this.request = {};
       this.data = {};
@@ -235,7 +258,9 @@ export default {
       //   });
       // self.data = data;
       // self.active = true;
-      if (window.confirm('Request from ' + data.path.distance)){
+      var x = window.confirm('Request from ' + data.path.distance+ 'm');
+      console.log(x);
+      if (x){
         console.log(data);
 
         self.$socket.emit('driver_accept_request', data);
@@ -269,12 +294,30 @@ export default {
             position: {lat: self.marker.position.lat,lng: self.marker.position.lng}
           }
         self.$socket.emit('driver_ready', dataSet);
+        self.$store.dispatch('driverPosition', self.marker).then(result => {
+          result.address[0].streetNumber = result.address[0].streetNumber?result.address[0].streetNumber:'15c';
+          self.center = L.latLng(self.marker.position.lat,self.marker.position.lng);
+          self.address = result.address[0].streetNumber + ', '+ result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
+      })
       }
       else{
         self.$toastr.error('Driver position update', 'Error');
       }
     });
-
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        self.marker.position.lat = position.coords.latitude;
+        self.marker.position.lng = position.coords.longitude;
+        self.marker.visible = true;
+        self.$store.dispatch('driverPosition', self.marker).then(result=>{
+          result.address[0].streetNumber = result.address[0].streetNumber?result.address[0].streetNumber +', ' :'';
+          self.center = L.latLng(self.marker.position.lat,self.marker.position.lng);
+          self.address = result.address[0].streetNumber + result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
+      })
+      });
+    } else {
+      
+    }
   },
   beforeDestroy(){
     this.$socket.emit('driver_logout')
