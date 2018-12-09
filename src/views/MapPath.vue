@@ -30,11 +30,11 @@
         </l-map>
         </div>
         <div class="col-md-3">
-          <div class = "driver-info">
+          <div class = "info">
             <span id="label-driver">
               DRIVER INFORMATION 
             </span>
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover table-info">
               <tbody>
                  <tr>
                   <th scope="row">Full name</th>
@@ -164,8 +164,8 @@ export default {
 };
 </script>
 <style>
-.driver-info {
-  margin-top: 20%;
+.info {
+  margin-top: 15%;
 }
 
 .btn-located {
@@ -178,14 +178,14 @@ export default {
   text-align: left;
 }
 
-#label-driver {
+#label-info {
   font-size: 25px;
   text-decoration-line: left;
   letter-spacing: 3px;
   font-family: "Georgia", Times, serif;
 }
 
-table {
+.table-info {
   margin-top: 15%;
   width: 100%;
   border-collapse: collapse;

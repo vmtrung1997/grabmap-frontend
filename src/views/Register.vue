@@ -34,7 +34,7 @@
             </select>
         </div>
       <div class="form-group">
-        <button type="submit" class="btn btn-submit">Create Account</button>
+        <button type="submit" class="btn btn-success btn-submit">Create Account</button>
       </div>
 
     </form>
@@ -73,3 +73,11 @@ export default {
   }
 }
 </script>
+<style>
+  .my-form {
+    margin-top: 75px;
+  }
+  h2 {
+    font-weight: bold;
+  }
+</style>

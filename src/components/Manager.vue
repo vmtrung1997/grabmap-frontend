@@ -1,7 +1,7 @@
 <template>
   <div class="about">
-    <h1>Request table</h1>
-    <table class="table table-hover">
+    <h1>Manager</h1>
+    <table class="table table-hover table-manage">
         <thead>
             <tr >
                 <th>Name</th>
@@ -9,7 +9,7 @@
                 <th>Address</th>
                 <th>Note</th>
                 <th>State</th>
-                <th>Status</th>
+                <th>View Path</th>
             </tr>
         </thead>
         <tbody>
@@ -19,7 +19,7 @@
                 <td class="text-left">{{request.address}}</td>
                 <td class="text-left">{{request.note}}</td>
                 <td class="text-left">{{request.state}}</td>
-                <td class="text-left"><router-link :to="{name: 'viewPath', params:{id: request._id}}">view status</router-link></td>
+                <td class="text-left"><router-link v-if= "request.state == 'request_accepted'|| request.state == 'moving' || request.state == 'finished'" :to="{name: 'viewPath', params:{id: request._id}}">view status</router-link></td>
             </tr>
         </tbody>
     </table>
@@ -50,3 +50,12 @@ export default {
   }
 }
 </script>
+
+<style>
+  .table-manage {
+    margin-top: 4%;
+  }
+  .about {
+    margin-top: 40px;
+  }
+</style>
