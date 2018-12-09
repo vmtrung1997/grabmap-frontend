@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Request not located table</h1>
+    <h1>App2 Identifier</h1>
     <table class="table table-hover">
         <thead>
             <tr >

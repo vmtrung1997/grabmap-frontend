@@ -27,10 +27,10 @@
       <div class="form-group">
             <label>Choose type</label>
             <select class="form-control" name="selector" id="selector" v-model="type">
-                <option value="client">Client</option>
-                <option value="identifier">Identifier</option>
-                <option value="manager">Manager</option>
-                <option value="driver">Driver</option>
+                <option value="client">#App1 Client</option>
+                <option value="identifier">#App2 Identifier</option>
+                <option value="manager">#App3 Manager</option>
+                <option value="driver">#App4 Driver</option>
             </select>
         </div>
       <div class="form-group">

@@ -43,11 +43,11 @@ export default {
   color: #2c3e50;
   margin-bottom: 0px;
 }
-  .container {
+  /* .container {
     height: 555px;
     width: 100%;
     background-image: linear-gradient(to left,  #abbaab, #ffffff, #abbaab);
-  }
+  } */
   .my-form {
     max-width: 500px;
     margin: 0 auto;

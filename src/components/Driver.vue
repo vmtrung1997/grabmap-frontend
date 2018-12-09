@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+    <div class="text-center">App4 Driver</div>
     <div class="container">
       <!-- <div class="modal-mask">
       <md-dialog-confirm style="z-index: 9999 !important;"
@@ -145,13 +145,9 @@ export default {
       divStarting: false,
       value: '',
       active : false,
-      data: {}
+      data: {},
+      currentState: ''
     };
-  },
-  computed: {
-    currentState() {
-      return this.isReady ? "READY" : "STANDBY";
-    }
   },
   methods: {
     zoomUpdate(zoom) {
@@ -282,8 +278,9 @@ export default {
         self.$socket.emit('driver_discard_request', data);
       }
     });
-    self.$socket.on('driver_accept_request', function(data){
-
+    self.$socket.on('driver_change_state', function(data){
+      console.log(data);
+      self.currentState = data;
     });
 
     self.$socket.on('drive_moving_response', function(data){
@@ -291,7 +288,6 @@ export default {
         self.$toastr.error('Distance orver 100m', 'Error');
       }
       else{
-        self.$toastr.success('Driver position update', 'Success');
         self.marker.position = data.returnData.end;
       }
     });

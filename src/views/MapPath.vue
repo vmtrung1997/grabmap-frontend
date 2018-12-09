@@ -14,7 +14,7 @@
         <l-tile-layer
           :url="url"
           :attribution="attribution"/>
-        <l-marker v-if="markers.length!=0" v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
+        <l-marker v-show="markers.length!=0" v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
           :draggable="marker.draggable"
           :lat-lng.sync="marker.position"
           :icon = "marker.icon">
@@ -44,6 +44,10 @@
                   <th scope="row">Type</th>
                   <td>{{driver.type}}</td>  
                 </tr>
+                <tr>
+                  <th scope="row">Phone</th>
+                  <td>{{driver.phone}}</td>  
+                </tr>
               </tbody>
             </table>
           </div>
@@ -54,7 +58,7 @@
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup, LLayerGroup, LPolyline, LPolygon} from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup, LPolyline} from "vue2-leaflet";
 
 import { L } from "vue2-leaflet";
 
@@ -66,7 +70,6 @@ export default {
     LMarker,
     LPopup,
     LPolyline,
-    LPolygon 
   },
   data() {
     return {
@@ -108,7 +111,6 @@ export default {
       alert("Popup Click!");
     },
     getDriverInfo(){
-      var self = this;
       return new Promise((resolve, reject) => {
         this.$store.dispatch('getDriverDetail', {idRequest: this.$route.params.id})
         .then(data => {

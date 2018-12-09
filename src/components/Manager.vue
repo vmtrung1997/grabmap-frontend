@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Request table</h1>
+    <h1>App3 Manager</h1>
     <table class="table table-hover">
         <thead>
             <tr >
@@ -19,7 +19,7 @@
                 <td class="text-left">{{request.address}}</td>
                 <td class="text-left">{{request.note}}</td>
                 <td class="text-left">{{request.state}}</td>
-                <td class="text-left"><router-link :to="{name: 'viewPath', params:{id: request._id}}">view status</router-link></td>
+                <td class="text-left"><router-link v-if="request.state=='request accepted' || request.state=='moving' || request.state=='finished'" :to="{name: 'viewPath', params:{id: request._id}}">view status</router-link></td>
             </tr>
         </tbody>
     </table>
