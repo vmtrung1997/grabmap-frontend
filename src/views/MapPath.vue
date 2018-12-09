@@ -14,7 +14,7 @@
         <l-tile-layer
           :url="url"
           :attribution="attribution"/>
-        <l-marker v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
+        <l-marker v-if="markers.length!=0" v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
           :draggable="marker.draggable"
           :lat-lng.sync="marker.position"
           :icon = "marker.icon">
@@ -24,9 +24,6 @@
             </div>
           </l-popup>
         </l-marker>
-        <l-marker :visible="marker.visible"
-          :draggable="marker.draggable"
-          :lat-lng.sync="marker.position"/>
         <l-polyline
           :lat-lngs="polyline.latlngs"
           :color="polyline.color"/>
@@ -40,12 +37,12 @@
             <table class="table table-bordered table-hover table-info">
               <tbody>
                  <tr>
-                  <th scope="row">User Name</th>
-                  <td>{{driver.username}}</td>
+                  <th scope="row">Full name</th>
+                  <td>{{driver.fullname}}</td>
                 </tr>
                 <tr>
-                  <th scope="row">State</th>
-                  <td>{{driver.state}}</td>  
+                  <th scope="row">Type</th>
+                  <td>{{driver.type}}</td>  
                 </tr>
               </tbody>
             </table>
@@ -78,38 +75,8 @@ export default {
       url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      markers: [
-        { 
-          id: 'm1',
-          position: {lat: 10.7721, lng: 106.65777},
-          tooltip: 'tooltip for marker1',
-          draggable: true,
-          visible: true,
-          icon: L.icon.glyph({
-            prefix: '',
-            glyph: 'A'})
-        },
-        { 
-          id: 'm2', 
-          position: {lat: 10.8721, lng: 106.75777},
-          tooltip: 'tooltip for marker2', 
-          draggable: true,
-          visible: true,
-          icon: L.icon.glyph({
-            prefix: '',
-            glyph: 'B'})
-      },
-      ],
-      marker: {
-        position: { lat: 1, lng: 1 },
-        draggable: false,
-        visible: false,
-
-        icon: L.icon.glyph({
-          prefix: "",
-          glyph: "A"
-        })
-      },
+      markers: [],
+      
       tempMarkers: [],
       polyline: {
         latlngs: [],
@@ -140,37 +107,54 @@ export default {
     popupClick() {
       alert("Popup Click!");
     },
-    setLocation() {
-      this.tempMarkers = this.markers;
-      this.markers = [];
-      this.marker.visible = true;
-      this.marker.position.lat = this.currentCenter.lat;
-      this.marker.position.lng = this.currentCenter.lng;
-      this.marker.draggable = true;
-      this.isDisable = false
-    },
     getDriverInfo(){
       var self = this;
-      this.$store.dispatch('getDriverDetail', {idRequest: this.$route.params.id})
-      .then(data => {
-        self.driver = data.dataDriver; 
-        self.request = data.DataRequest;
-      })
-      .catch(error => console.log(error));
+      return new Promise((resolve, reject) => {
+        this.$store.dispatch('getDriverDetail', {idRequest: this.$route.params.id})
+        .then(data => {
+          resolve(data);
+        })
+        .catch(error => reject(error));
+      });
+      
     }, 
   },
   beforeMount(){
       var self = this;
-      this.$store.dispatch('getRouteDriverClient', {requestPosition: this.markers[0].position, driverPosition: this.markers[1].position})
-      .then(data => {
-        var ret = new Array;
-        var dataArr  = data.res.paths[0].points.coordinates;
-        for(var i of dataArr) {
-            ret.push(i.reverse());
-        }
-        this.polyline.latlngs = ret;
-        this.center = this.markers[1].position;
-      });
+      self.getDriverInfo().then(result => {
+        self.markers.push({
+          id: 'm1',
+          position: {lat: result.request.position.lat, lng: result.request.position.lng},
+          tooltip: 'tooltip for marker1',
+          draggable: true,
+          visible: true,
+          icon: L.icon.glyph({
+            prefix: '',
+            glyph: 'A'})
+        });
+        self.markers.push({
+          id: 'm2',
+          position: {lat: result.request.driverPosition.lat, lng: result.request.driverPosition.lng},
+          tooltip: 'tooltip for marker2',
+          draggable: true,
+          visible: true,
+          icon: L.icon.glyph({
+            prefix: '',
+            glyph: 'B'})
+        });
+        self.$store.dispatch('getRouteDriverClient',
+         {requestPosition: result.request.position, driverPosition: result.request.driverPosition})
+          .then(data => {
+            var ret = new Array;
+            var dataArr  = data.res.paths[0].points.coordinates;
+            for(var i of dataArr) {
+                ret.push(i.reverse());
+            }
+            self.driver = result.driver;
+            self.polyline.latlngs = ret;
+          });
+      })
+      
     },
   mounted() {
     setTimeout(function() {
