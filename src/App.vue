@@ -44,6 +44,7 @@ export default {
   margin-bottom: 0px;
 }
   .container {
+    max-height: 600px;
     height: 555px;
     width: 100%;
     background-image: linear-gradient(to left,  #abbaab, #ffffff, #abbaab);
