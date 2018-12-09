@@ -1,70 +1,77 @@
 <template>
   <div>
     <div class="container">
-      <div class="col-md-8">
-        <l-map
-      :zoom="zoom"
-      :center="center"
-      :options="mapOptions"
-      style="height: 400px;width: 600px"
-      @update:center="centerUpdate"
-      @update:zoom="zoomUpdate">
-      <l-tile-layer
-        :url="url"
-        :attribution="attribution"/>
-      <l-marker v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
-        :draggable="marker.draggable"
-        :lat-lng.sync="marker.position">
-        <l-popup>
-          <div @click="popupClick">
-            I am a tooltip
-            <p v-show="showParagraph">
-              Lorem ipsum dolor sit 
-            </p>
+     <div class="content">
+        <div class="col-md-9">
+          <l-map
+          :zoom="zoom"
+          :center="center"
+          :options="mapOptions"
+          style="height: 500px;width: 900px"
+          @update:center="centerUpdate"
+          @update:zoom="zoomUpdate">
+          <l-tile-layer
+            :url="url"
+            :attribution="attribution"/>
+          <l-marker v-for="(marker, index) in markers" :key="index" :visible="marker.visible"
+            :draggable="marker.draggable"
+            :lat-lng.sync="marker.position">
+            <l-popup>
+              <div @click="popupClick">
+                I am a tooltip
+                <p v-show="showParagraph">
+                  Lorem ipsum dolor sit 
+                </p>
+              </div>
+            </l-popup>
+          </l-marker>
+          <l-marker :visible="marker.visible"
+          :draggable="marker.draggable"
+          :lat-lng.sync="marker.position"/>
+          </l-map>
+        </div>
+          <div class="col-md-3">
+            <div class = "info">
+              <span id="label-info">
+                REQUEST
+              </span>
+              <table class="table table-bordered table-hover table-info">
+                <tbody>
+                   <tr>
+                    <th scope="row">Fullname</th>
+                    <td>{{request.name}}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Phone</th>
+                    <td>{{request.phone}}</td>  
+                  </tr>
+                  <tr>
+                    <th scope="row">Address</th>
+                    <td>{{request.address}}</td>  
+                  </tr>
+                  <tr>
+                    <th scope="row">Note</th>
+                    <td>{{request.note}}</td>  
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="group-row">
+              <input type="button" class="btn btn-success btn-located" @click="setLocation" value="Set locate" :disabled="!isDisable"/>
+            </div>
+            <div class="group-row">
+              <input type="button" class="btn btn-primary btn-located" @click="submitRequest" value="Submit" :disabled="isDisable"/>
+            </div>
           </div>
-        </l-popup>
-      </l-marker>
-      <l-marker :visible="marker.visible"
-        :draggable="marker.draggable"
-        :lat-lng.sync="marker.position"/>
-    </l-map>
-      </div>
-      <div class="col-md-4">
-        <div>
-          <form action="">
-            <h2>
-              Request
-            </h2>
-            <div class="form-group">
-              <label for=""> Fullname: </label>{{request.name}}
-            </div>
-            <div class="form-group">
-              <label for="">Phone: </label>{{request.phone}}
-            </div>
-            <div class="form-group">
-              <label for="">Address: </label>{{request.address}}
-            </div>
-            <div class="form-group">
-              <label for="">Note: </label>{{request.note}}
-            </div>
-          </form>
         </div>
-        <div class="group-row">
-          <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isDisable"/>
-        </div>
-        <div class="group-row">
-          <input type="button" class="btn btn-default btn-located" @click="submitRequest" value="Submit" :disabled="isDisable"/>
-        </div>
-      </div>
-    </div>
-    <div>
-     
+      <div>
+     </div>
     </div>
   </div>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LPopup, LLayerGroup } from "vue2-leaflet";
+import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet";
 
 import { L } from "vue2-leaflet";
 
@@ -160,7 +167,7 @@ export default {
         position: this.marker.position
       }
       console.log(requestLocated)
-      this.$store.dispatch('requestLocated',requestLocated).then(result=>{
+      this.$store.dispatch('requestLocated',requestLocated).then(()=>{
         this.$socket.emit('identifier_located_request', requestLocated);
         this.$toastr.success('Request has been submited', 'Success');
         self.$router.push({name: 'home'})

@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>App2 Identifier</h1>
-    <table class="table table-hover">
+    <table class="table table-hover table-identifier">
         <thead>
             <tr >
                 <th>Name</th>
@@ -50,3 +50,10 @@ export default {
   }
 }
 </script>
+
+<style>
+  .table-identifier{
+    margin-top: 5%;
+  }
+
+</style>

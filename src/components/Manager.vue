@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>App3 Manager</h1>
-    <table class="table table-hover">
+    <table class="table table-hover table-manage">
         <thead>
             <tr >
                 <th>Name</th>
@@ -9,7 +9,7 @@
                 <th>Address</th>
                 <th>Note</th>
                 <th>State</th>
-                <th>Status</th>
+                <th>View Path</th>
             </tr>
         </thead>
         <tbody>
@@ -50,3 +50,12 @@ export default {
   }
 }
 </script>
+
+<style>
+  .table-manage {
+    margin-top: 4%;
+  }
+  .about {
+    margin-top: 40px;
+  }
+</style>

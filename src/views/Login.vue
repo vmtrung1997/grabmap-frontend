@@ -13,7 +13,7 @@
       </div>
 
       <div class="form-group">
-        <button type="submit" class="btn btn-default btn-submit">
+        <button type="submit" class="btn btn-success btn-submit">
           Login
         </button>
       </div>

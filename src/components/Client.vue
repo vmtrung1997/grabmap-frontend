@@ -54,6 +54,7 @@ export default {
                     this.$toastr.success('Request has been submited', 'Success');
                 }
           }).catch(error => {
+              console.log(error)
           })
       }
   }

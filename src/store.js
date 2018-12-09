@@ -50,31 +50,28 @@ export default new Vuex.Store({
     retrieveAccessToken(state, token) {
       state.access_token = token
     },
-    destroyAccessToken(state, token) {
+    destroyAccessToken(state) {
       state.access_token = null;
     },
     retrieveRefreshToken(state, token) {
       state.refresh_token = token
     },
-    destroyRefreshToken(state, token) {
+    destroyRefreshToken(state) {
       state.refresh_token = null;
     },
-    destroyToken(state, token) {
+    destroyToken(state) {
       state.access_token = null;
       state.refresh_token = null;
     },
     retrieveProfile(state, data) {
       state.profile = data;
     },
-    clearProfile(state, data) {
+    clearProfile(state) {
       state.profile = {};
     }
   },
   actions: {
-    socket_userGetSuccess(context, data) {
-      console.log('user get success');
-    },
-    getProfile(context, data) {
+    getProfile(context) {
       var refresh_token = localStorage.getItem('refresh_token');
       if (refresh_token) {
         return new Promise((resolve, reject) => {
@@ -91,7 +88,7 @@ export default new Vuex.Store({
         })
       }
     },
-    destroyToken(context, data) {
+    destroyToken(context) {
       console.log(context.state.access_token);
       axios.defaults.headers.common['x-access-token'] = context.state.access_token
       axios.defaults.headers.common['x-refresh-token'] = context.state.refresh_token

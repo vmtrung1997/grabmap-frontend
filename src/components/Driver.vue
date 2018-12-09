@@ -2,57 +2,43 @@
   <div>
     <div class="text-center">App4 Driver</div>
     <div class="container">
-      <!-- <div class="modal-mask">
-      <md-dialog-confirm style="z-index: 9999 !important;"
-      :md-active.sync="active"
-      md-title="Use Google's location service?"
-      md-content="Let Google help apps determine location. <br> This means sending <strong>anonymous</strong> location data to Google, even when no apps are running."
-      md-confirm-text="Agree"
-      md-cancel-text="Disagree"
-      @md-cancel="onCancel"
-      @md-confirm="onConfirm" />
-      </div> -->
-      <div class="col-md-8">
-        <l-map
-      :zoom="zoom"
-      :center="center"
-      :options="mapOptions"
-      style="height: 400px;width: 600px;z-index: 0 !important;"
-      @update:center="centerUpdate"
-      @update:zoom="zoomUpdate"
-      @click="onClickMap">
-      <l-tile-layer
-        :url="url"
-        :attribution="attribution"/>
-      <l-marker :visible="marker.visible"
-        :draggable="marker.draggable"
-        :lat-lng.sync="marker.position"
-        :icon="marker.icon"/>
-      
-      <l-polyline
-          :lat-lngs="polylineRequest.points"
-          :visible="polylineRequest.visible"
-          :color="polylineRequest.color" />
-
-      <l-marker :visible="markerRq.visible"
-        :draggable="false"
-        :lat-lng="markerRq.position"
-        :icon="markerRq.icon"/>
-      
-    </l-map>
-      </div>
-      <div class="col-md-4">
-        <div class="group-row">
-            <label>Current driver position:</label>&nbsp;{{marker.position}}
-            <div>
-          <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isLocated"/>
-          <input type="button" class="btn btn-default btn-located" @click="getLocation" value="Get locate" :disabled="isLocated"/>
-            </div>
+      <div class="content">
+        <div class="col-md-9">
+          <l-map
+        :zoom="zoom"
+        :center="center"
+        :options="mapOptions"
+        style="height: 500px;width: 900px;z-index: 0 !important;"
+        @update:center="centerUpdate"
+        @update:zoom="zoomUpdate">
+        <l-tile-layer
+          :url="url"
+          :attribution="attribution"/>
+        <l-marker :visible="marker.visible"
+          :draggable="marker.draggable"
+          :lat-lng.sync="marker.position"
+          :icon="marker.icon"/>
+        
+        <l-polyline
+            :lat-lngs="polylineRequest.points"
+            :visible="polylineRequest.visible"
+            :color="polylineRequest.color" />
+        
+          </l-map>
         </div>
-        <div class="group-row">
-          <label>Current state:</label>&nbsp;{{currentState}}
-          <div>
-              <input type="button" class="btn btn-default btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
+        <div class="col-md-3">
+          <div class="group-row">
+              <label>Current driver position:</label>&nbsp;{{marker.position}}
+              <div>
+            <input type="button" class="btn btn-default btn-located" @click="setLocation" value="Set locate" :disabled="!isLocated"/>
+            <input type="button" class="btn btn-default btn-located" @click="getLocation" value="Get locate" :disabled="isLocated"/>
+              </div>
+          </div>
+          <div class="group-row">
+            <label>Current state:</label>&nbsp;{{currentState}}
+            <div>
+                <input type="button" class="btn btn-default btn-located" @click="changeState" value="Change State" :disabled="isReady && !isLocated"/>
+            </div>
           </div>
         </div>
         <div class="group-row" v-show="divStarting">
@@ -62,24 +48,6 @@
         </div>
       </div>
     </div>
-    <!-- <md-dialog-confirm
-      :md-active.sync="active"
-      md-title="Use Google's location service?"
-      md-content="Let Google help apps determine location. <br> This means sending <strong>anonymous</strong> location data to Google, even when no apps are running."
-      md-confirm-text="Agree"
-      md-cancel-text="Disagree"
-      @md-cancel="onCancel"
-      @md-confirm="onConfirm" /> -->
-    <div>
-    </div>
-    <!-- <confirm-modal
-              btn-text='<i class="fa fa-trash"></i> Delete'
-              btn-class="btn-danger"
-              :post-data="{userId: '123'}"
-              v-on:onConfirm="removeUserFromList(user)"
-              message="Are you sure you want to delete this user?">
-            </confirm-modal> -->
-    
   </div>
 </template>
 
@@ -296,11 +264,11 @@ export default {
       if (data.res){
         self.$toastr.success('Request finish', 'Success');
         self.resetRequest();
-        var data = {
+        var dataSet = {
             driverId: self.profile._id,
             position: {lat: self.marker.position.lat,lng: self.marker.position.lng}
           }
-        self.$socket.emit('driver_ready', data);
+        self.$socket.emit('driver_ready', dataSet);
       }
       else{
         self.$toastr.error('Driver position update', 'Error');
@@ -318,9 +286,13 @@ export default {
   max-height: 200px;
   margin: 0 20px;
 }
+.btn-located:hover{
+  color: Khaki;
+}
 .group-row {
   display: block;
   margin-bottom: 20px;
   text-align: left;
+  font-size: 25px;
 }
 </style>
