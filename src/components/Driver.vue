@@ -144,7 +144,8 @@ export default {
       self.isLocated = true;
       self.$store.dispatch('driverPosition', self.marker).then(result=>{
         console.log(result);
-        self.address = result.address[0].streetNumber + ', '+ result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
+        result.address[0].streetNumber = result.address[0].streetNumber?result.address[0].streetNumber + ', ':'';
+        self.address = result.address[0].streetNumber +  result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
       })
 
     },
@@ -242,7 +243,7 @@ export default {
     var self=this;
     setTimeout(function() {
       window.dispatchEvent(new Event("resize"));
-    }, 250);
+    }, 100);
     self.$socket.on('driver_confirm_request', function(data){
       // self.$dialog.confirm('Request from ' + data.path)
       //   .then(function (dialog) {
@@ -295,9 +296,9 @@ export default {
           }
         self.$socket.emit('driver_ready', dataSet);
         self.$store.dispatch('driverPosition', self.marker).then(result => {
-          result.address[0].streetNumber = result.address[0].streetNumber?result.address[0].streetNumber:'15c';
+          result.address[0].streetNumber = result.address[0].streetNumber?result.address[0].streetNumber + ', ':'';
           self.center = L.latLng(self.marker.position.lat,self.marker.position.lng);
-          self.address = result.address[0].streetNumber + ', '+ result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
+          self.address = result.address[0].streetNumber +  result.address[0].streetName+ ', '+result.address[0].city+ ', ' + result.address[0].country;
       })
       }
       else{
