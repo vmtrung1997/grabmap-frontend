@@ -19,7 +19,7 @@
                 <td class="text-left">{{request.address}}</td>
                 <td class="text-left">{{request.note}}</td>
                 <td class="text-left">{{request.state}}</td>
-                <td class="text-left"><router-link :to="{name: 'locate', params:{id: request._id}}">located</router-link></td>
+                <td class="text-left"><router-link v-on:click.native="locateRequest" :to="{name: 'locate', params:{id: request._id}}">located</router-link></td>
             </tr>
         </tbody>
     </table>
@@ -40,6 +40,9 @@ export default {
             .then(data => {self.requests = data; console.log(data)})
             .catch(error => console.log(error));
         //alert('client create request')
+      },
+      locateRequest(){
+        this.$socket.emit('idendifier_locate_request');
       }
   },
   beforeMount() {
